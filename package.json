@@ -1,0 +1,14 @@
+{
+  "name": "motka",
+  "version": "1.0.0",
+  "description": "Location tracking link generator",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
