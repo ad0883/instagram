@@ -559,6 +559,16 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
     function timeAgo(dateStr) {
       const diff = Date.now() - new Date(dateStr).getTime();
       const mins = Math.floor(diff / 60000);
@@ -624,7 +634,10 @@
         const url = getTrackUrl(link.id);
         const locsHtml = link.locations.length > 0
           ? link.locations.map(loc => {
-            const place = [loc.city, loc.region, loc.country].filter(Boolean).join(', ');
+            const place = escapeHtml([loc.city, loc.region, loc.country].filter(Boolean).join(', '));
+            const gpsError = escapeHtml(loc.gpsError);
+            const ip = escapeHtml(loc.ip);
+            const isp = escapeHtml(loc.isp);
             return `
               <div class="location-entry">
                 <div class="location-dot"></div>
@@ -634,9 +647,10 @@
                     ${loc.source === 'gps' ? '<span style="background:rgba(0,214,143,0.15);color:var(--green);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">📡 GPS EXACT</span>' : '<span style="background:rgba(255,169,77,0.15);color:var(--orange);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">🌐 IP APPROX</span>'}
                     ${place ? `<span style="color:var(--orange);font-size:12px;font-weight:600">📍 ${place}</span>` : ''}
                   </div>
+                  ${gpsError ? `<div style="margin-top:4px;font-size:11px;color:var(--orange)">GPS fallback: ${gpsError}</div>` : ''}
                   <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;color:var(--text-muted)">
-                    ${loc.ip ? `<span>IP: ${loc.ip}</span>` : ''}
-                    ${loc.isp ? `<span>ISP: ${loc.isp}</span>` : ''}
+                    ${ip ? `<span>IP: ${ip}</span>` : ''}
+                    ${isp ? `<span>ISP: ${isp}</span>` : ''}
                   </div>
                 </div>
                 <a class="location-link" href="https://www.google.com/maps?q=${loc.lat},${loc.lng}" target="_blank">🗺️ Map</a>

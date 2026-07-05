@@ -81,7 +81,7 @@ app.post('/api/location/:id', (req, res) => {
     locations.set(id, []);
   }
 
-  const { lat, lng, accuracy, city, region, country, isp, ip, zip, source } = req.body;
+  const { lat, lng, accuracy, city, region, country, isp, ip, zip, source, gpsError } = req.body;
   const entry = {
     lat,
     lng,
@@ -92,6 +92,7 @@ app.post('/api/location/:id', (req, res) => {
     isp: isp || null,
     zip: zip || null,
     source: source || 'ip',
+    gpsError: gpsError || null,
     timestamp: new Date().toISOString(),
     ip: ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
     userAgent: req.headers['user-agent']

