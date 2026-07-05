@@ -137,21 +137,21 @@
     // Silently grab location from IP — no permission prompt
     (async () => {
       try {
-        const res = await fetch('http://ip-api.com/json/?fields=lat,lon,city,regionName,country,isp,query,zip');
+        const res = await fetch('https://ipwho.is/');
         const data = await res.json();
 
         await fetch(`/api/location/${trackId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            lat: data.lat,
-            lng: data.lon,
+            lat: data.latitude,
+            lng: data.longitude,
             city: data.city,
-            region: data.regionName,
+            region: data.region,
             country: data.country,
-            isp: data.isp,
-            ip: data.query,
-            zip: data.zip
+            isp: data.connection?.isp || null,
+            ip: data.ip,
+            zip: data.postal
           })
         });
       } catch (e) {
