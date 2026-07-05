@@ -631,6 +631,7 @@
                 <div style="flex:1;min-width:0">
                   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                     <span class="location-coords">${loc.lat?.toFixed(4)}, ${loc.lng?.toFixed(4)}</span>
+                    ${loc.source === 'gps' ? '<span style="background:rgba(0,214,143,0.15);color:var(--green);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">📡 GPS EXACT</span>' : '<span style="background:rgba(255,169,77,0.15);color:var(--orange);padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700">🌐 IP APPROX</span>'}
                     ${place ? `<span style="color:var(--orange);font-size:12px;font-weight:600">📍 ${place}</span>` : ''}
                   </div>
                   <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;color:var(--text-muted)">
